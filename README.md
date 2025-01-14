@@ -1,51 +1,156 @@
-*Advancing Spatial-Temporal Rock Fracture Prediction with Virtual Camera-Based Data
-Augmentation*
+**Advancing Spatial-Temporal Rock Fracture Prediction with Virtual Camera-Based Data Augmentation**
 
-## Abstract
-Predicting rock fractures in unexcavated areas is a critical yet challenging aspect of
-geotechnical projects. This task involves forecasting the fracture mapping sequences
-for unexcavated rock faces using the sequences from excavated ones, which is well-suited for spatial-temporal deep learning techniques. Fracture mapping sequences for
-deep learning model training can be achieved based on field photography. However,
-the main obstacle lies in the insufficient availability of high-quality photos. Existing data
-augmentation techniques rely on slices taken from Discrete Fracture Network (DFN)
-models. However, slices differ significantly from actual photos taken from the field. To
-overcome this limitation, this study introduces a new framework that uses Virtual
-Camera Technology (VCT) to generate “virtual photos” from DFN models. The external
-(e.g., camera location, direction) and internal parameters (e.g., focal length, resolution,
-sensor size) of cameras can be considered in this method. The “virtual photos”
-generated from the VCT and conventional slicing method have been extensively
-compared. The framework is designed to adapt to any distribution of field fractures and
-camera settings, serving as a universal tool for practical applications. The whole
-framework has been packaged as an open-source tool for rock “photos” generation. An
-open-source benchmark database has also been established based on this tool. To
-validate the framework's feasibility, the Predictive Recurrent Neural Network
-(PredRNN) method is applied to the generated database. A high degree of similarity is
-observed between the predicted mapping sequences and the ground truth. The model
-successfully captured the dynamic changes in fracture patterns across different
-sections, thereby confirming the framework's practical utility.
+---
 
-## Data Demo
+## Diagram
 
-![FixStep Animation](./images/FixStep05_PBSet1_20_80.gif)
+<image src="./images/diagram.png">
 
-*Figure 1: FixStep Mapping with color-image*
+*Diagram predicting rock fractures in unexcavated areas based on VCT and actual rock face data*
 
-![FixStep Animation 2](./images/FixStep05_PBSet1_20_80_2.gif)
+<image src="./images/camera-capture.png">
 
-*Figure 2: FixStep Mapping with binary-image*
+*Capture or Slice Rock Fractures*
 
-![NRandStep Animation](./images/NRandStep_PBSet1_20_80.gif)
+---
+## Usage for PredRNN-like Models
 
-*Figure 3: RandStep Mapping with color-image*
+If you are using a sequence forecasting model such as PredRNN for rock fracture mapping prediction, you may require a substantial amount of data. Here, we provide a tool to synthesize all the data you need!
 
-![NRandStep Animation 2](./images/NRandStep_PBSet1_20_80_2.gif)
+1. **Set Fracture Set and Virtual Camera Parameters**:  
+   - Configure the fracture set and virtual camera parameters in **[SRM_linedata_no_image.py](./SRM_linedata_no_image.py)**. Please read the functions' input parameters carefully!  
+   - Fractures in SRM sliced by a moving target plane and captured by a virtual camera will be saved in the Fracture directory as `.txt` files. These files will then be converted to `.npy` files for model training and testing. The DataFactory is used for data loading. Refer to other scripts for more details.
 
-*Figure 4: RandStep Mapping with binary-image*
+2. **Data Factory**:  
+   - A custom DataLoader for sequence prediction, see **[DataFactory](./DataFactory.py)**.
+
+---
+
+## Data Description
+
+The data includes the following attributes: fracture surface ID, center point coordinates, normal vector, radius, image fracture line center point coordinates, fracture line direction vector, fracture line length, observation distance, target plane position, distance between the target plane and the previous plane, image fracture line segment start point, image fracture line segment end point, actual fracture start point, and actual fracture end point.
+
+| 0 | 1,2,3 | 4,5,6 | 7 | 8,9 | 10,11 | 12 | 13 | 14 | 15 | 16,17 | 18,19 | 20,21 | 22,23 |
+
+- **fracId**: 0  
+- **fracCenter(3)**: 1, 2, 3  
+- **fracNormal(3)**: 4, 5, 6  
+- **fracRadius**: 7  
+- **segCenter(2)**: 8, 9  
+- **segDirection(2)**: 10, 11  
+- **segLength**: 12  
+- **ObserveDist**: 13  
+- **targetZ**: 14  
+- **StepSize**: 15  
+- **segStartX**: 16  
+- **segStartY**: 17  
+- **segEndX**: 18  
+- **segEndY**: 19  
+- **fracStartX**: 20  
+- **fracStartY**: 21  
+- **fracEndX**: 22  
+- **fracEndY**: 23  
+
+To eliminate the influence of image size, the coordinates are normalized. For details, see [SRM_linedata_no_image.py](./SRM_linedata_no_image.py):
+
+$$
+u = \left[ \frac{u_{1x}}{ResX}, \frac{u_{1y}}{ResY} \right]
+$$
+
+$$
+segCenter = \left[ \frac{u_{1x} + u_{2x}}{2}, \frac{u_{1y} + u_{2y}}{2} \right]
+$$
+
+$$
+segDirection = normalize \left( \left[ u_{2x} - u_{1x}, u_{2y} - u_{1y} \right] \right)
+$$
+
+$$
+segLength = \sqrt{(u_{1x} - u_{2x})^2 + (u_{1y} - u_{2y})^2}
+$$
+
+Where **ResX** and **ResY** are the image resolutions.
+
+To convert back to image coordinates:
+
+$$
+u_x = s_x \times ResX
+$$
+
+$$
+u_y = s_y \times ResY
+$$
+
+---
+
+## Demo Dataset Parameters
+
+| DataSet       | Type    | DipDirection | DipAngle | Fisher Constant | Size      | P30   | Num |
+| ------------- | ------- | ------------ | -------- | --------------- | --------- | ----- | ---- |
+| Set 1         | Single  | 60           | 40       | 25              | Exp 10 2  | 0.01  | 16   |
+| Set 2         | Single  | 210          | 70       | 20              | Exp 10 2  | 0.01  | 16   |
+| Set 3         | Single  | 300          | 60       | 15              | Exp 10 2  | 0.01  | 16   |
+| Set 4         | Fusion  | All above    | All above | All above      | Exp 10 2  | 0.01  | 16   |
+| SetUnion123   | Union123| -            | -        | -               | -         | -     | -    |
+| Set All       | Union1234| -           | -        | -               | -         | -     | -    |
+
+---
+you can download it from [Baidu,code:zyzs](https://pan.baidu.com/s/1truE9Zr6gsHzGHLH6VlXbw?pwd=zyzs).
+## Sequences GIF
+
+| Figure | Description | Animation |
+|--------|-------------|-----------|
+| **Figure 1** | FixStep Mapping with color-image | ![FixStep Animation](./images/FixStep05_PBSet1_20_80.gif) |
+| **Figure 2** | FixStep Mapping with binary-image | ![FixStep Animation 2](./images/FixStep05_PBSet1_20_80_2.gif) |
+| **Figure 3** | NRandStep Mapping with color-image | ![NRandStep Animation](./images/NRandStep_PBSet1_20_80.gif) |
+| **Figure 4** | NRandStep Mapping with binary-image | ![NRandStep Animation 2](./images/NRandStep_PBSet1_20_80_2.gif) |
+
+---
+---
+
 ## Usage
 
-If you are using a sequence forecasting model like PredRNN for rock fracture mapping prediction, you may need a substantial amount of data. Here, we provide a tool to synthesize all the data you need!
+UBG for DFN Model Generation is compiled under Windows with Python 3.10. Python 3.10 is required if you want to generate custom data.
 
+1. **Set Fracture Set and Virtual Camera Parameters**:  
+   - Configure the fracture set and virtual camera parameters in **[SRM_linedata_no_image.py](./SRM_linedata_no_image.py)**. Please read the functions' input parameters carefully!  
+   - Fractures in SRM sliced by a moving target plane and captured by a virtual camera will be saved in the Fracture directory as `.txt` files. These files will then be converted to `.npy` files for model training and testing. The DataFactory is used for data loading. Refer to other scripts for more details.
 
-## full code and data set
+2. **For Training PredRNN-like Models**:  
+   - See [repository](https://github.com/sungatetop/sequence-forecasting-learning.git) or [subdiroctory](./FracturePrediction/)
+---
 
-coming soon
+## Data Factory
+
+A custom DataLoader for sequence prediction, see **[DataFactory](./DataFactory.py)**.
+
+---
+
+## Acknowledgements
+
+- [UnBlocks-gen](https://github.com/ElsevierSoftwareX/SOFTX_2020_237.git)  
+- [PredRNN](https://github.com/thuml/predrnn-pytorch.git)
+
+---
+
+## Citation
+
+If you use this tool for your research, we would appreciate it if you cite it as follows:
+
+```
+@Misc{Baolin Chen and Jiawei Xie,
+  title ={SRM-Fracture Traces Generator},
+  author={Baolin Chen and Jiawei Xie},
+  howpublished ={\url{https://github.com/GEO-ATLAS/Rock-Camera.git}},
+  year={2023}
+}
+```
+
+```
+@article{ASTRFPwithVC,
+    title={Advancing Spatial-Temporal Rock Fracture Prediction with Virtual Camera-Based Data Augmentation},
+    author={Jiawei Xie, Baolin Chen, Jinsong Huang, Yuting Zhang, Cheng Zeng},
+    journal={Tunnelling and Underground Space Technology},
+    year={2024}
+}
+```
