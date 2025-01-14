@@ -151,6 +151,6 @@ If you use this tool for your research, we would appreciate it if you cite it as
     title={Advancing Spatial-Temporal Rock Fracture Prediction with Virtual Camera-Based Data Augmentation},
     author={Jiawei Xie, Baolin Chen, Jinsong Huang, Yuting Zhang, Cheng Zeng},
     journal={Tunnelling and Underground Space Technology},
-    year={2024}
+    year={2025}
 }
 ```
