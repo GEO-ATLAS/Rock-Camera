@@ -149,8 +149,13 @@ If you use this tool for your research, we would appreciate it if you cite it as
 ```
 @article{ASTRFPwithVC,
     title={Advancing Spatial-Temporal Rock Fracture Prediction with Virtual Camera-Based Data Augmentation},
-    author={Jiawei Xie, Baolin Chen, Jinsong Huang, Yuting Zhang, Cheng Zeng},
+    author={Xie, Jiawei and Chen, Baolin and Huang, Jinsong and Zhang, Yuting and Zeng, Cheng},
     journal={Tunnelling and Underground Space Technology},
-    year={2025}
+    volume={158},
+    pages={106400},
+    year={2025},
+    month={4},
+    doi={10.1016/j.tust.2025.106400},
+    publisher={Elsevier}
 }
 ```
