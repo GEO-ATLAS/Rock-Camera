@@ -139,7 +139,7 @@ If you use this tool for your research, we would appreciate it if you cite it as
 
 ```
 @Misc{Baolin Chen and Jiawei Xie,
-  title ={SRM-Fracture Traces Generator},
+  title ={Rock-Camera},
   author={Baolin Chen and Jiawei Xie},
   howpublished ={\url{https://github.com/GEO-ATLAS/Rock-Camera.git}},
   year={2023}
